@@ -7,8 +7,8 @@ MODEL:
   IF_WITH_CENTER: 'no'
   NAME: 'part_attention_vit'
   NO_MARGIN: True
-  DEVICE_ID: ('0,1')
-  DIST_TRAIN: True
+  DEVICE_ID: ('0')
+  DIST_TRAIN: False
   TRANSFORMER_TYPE: 'vit_base_patch16_224_TransReID'
   STRIDE_SIZE: [16, 16]
 
@@ -40,7 +40,7 @@ SOLVER:
   OPTIMIZER_NAME: 'SGD'
   MAX_EPOCHS: 40
   BASE_LR: 0.001 # 0.0004 for msmt
-  IMS_PER_BATCH: 128  # 64 per GPU with 2x T4
+  IMS_PER_BATCH: 64
   WARMUP_METHOD: 'linear'
   LARGE_FC_LR: False
   CHECKPOINT_PERIOD: 5
