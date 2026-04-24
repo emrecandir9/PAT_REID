@@ -68,7 +68,7 @@ if __name__ == '__main__':
     train_loader = build_reid_train_loader(cfg)
     # build DG validate loader
     val_name = cfg.DATASETS.TEST[0]
-    val_loader, num_query = build_reid_test_loader(cfg, val_name)
+    val_loader, num_query, imgpath_to_class = build_reid_test_loader(cfg, val_name)
     num_classes = len(train_loader.dataset.pids)
     model_name = cfg.MODEL.NAME
     model = make_model(cfg, modelname=model_name, num_class=num_classes, camera_num=None, view_num=None)
@@ -102,6 +102,7 @@ if __name__ == '__main__':
             scheduler,
             loss_func,
             num_query, args.local_rank,
+            imgpath_to_class=imgpath_to_class,
         )
     else :
         do_train_dict[model_name](
@@ -114,5 +115,6 @@ if __name__ == '__main__':
             loss_func,
             num_query, args.local_rank,
             patch_centers = patch_centers,
-            pc_criterion = pc_criterion
+            pc_criterion = pc_criterion,
+            imgpath_to_class = imgpath_to_class,
         )

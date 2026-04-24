@@ -130,6 +130,11 @@ _C.DATASETS.TEST = ('DukeMTMC',)
 _C.DATASETS.ROOT_DIR = ('../data')
 # combine both train and test sets
 _C.DATASETS.COMBINEALL = False
+# Hard class filtering — per-query gallery truncation at eval time
+# When ENABLED=True, for each query q the gallery is filtered to G_hard = {g_i | C(g_i) = C(q)}
+_C.DATASETS.HARD_CLASS_FILTER = CN()
+_C.DATASETS.HARD_CLASS_FILTER.ENABLED = False          # Toggle on/off
+_C.DATASETS.HARD_CLASS_FILTER.CLASSES = []              # Reserved for future use
 
 
 # -----------------------------------------------------------------------------

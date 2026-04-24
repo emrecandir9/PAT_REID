@@ -22,7 +22,8 @@ def part_attention_vit_do_train_with_amp(cfg,
              loss_fn,
              num_query, local_rank,
              patch_centers = None,
-             pc_criterion= None):
+             pc_criterion= None,
+             imgpath_to_class = None):
     log_period = cfg.SOLVER.LOG_PERIOD
     checkpoint_period = cfg.SOLVER.CHECKPOINT_PERIOD
     eval_period = cfg.SOLVER.EVAL_PERIOD
@@ -172,7 +173,7 @@ def part_attention_vit_do_train_with_amp(cfg,
                         logger.info("CMC curve, Rank-{:<3}:{:.1%}".format(r, cmc[r - 1]))
                     torch.cuda.empty_cache()
             else:
-                cmc, mAP = do_inference(cfg, model, val_loader, num_query)
+                cmc, mAP = do_inference(cfg, model, val_loader, num_query, imgpath_to_class=imgpath_to_class)
                 tbWriter.add_scalar('val/Rank@1', cmc[0], epoch)
                 tbWriter.add_scalar('val/mAP', mAP, epoch)
 
@@ -198,8 +199,8 @@ def part_attention_vit_do_train_with_amp(cfg,
     for testname in cfg.DATASETS.TEST:
         if 'ALL' in testname:
             testname = 'DG_' + testname.split('_')[1]
-        val_loader, num_query = build_reid_test_loader(cfg, testname)
-        do_inference(cfg, eval_model, val_loader, num_query)
+        val_loader, num_query, imgpath_to_class_final = build_reid_test_loader(cfg, testname)
+        do_inference(cfg, eval_model, val_loader, num_query, imgpath_to_class=imgpath_to_class_final)
     
     # remove useless path files
     del_list = os.listdir(log_path)
@@ -215,7 +216,8 @@ def part_attention_vit_do_train_with_amp(cfg,
 def do_inference(cfg,
                  model,
                  val_loader,
-                 num_query):
+                 num_query,
+                 imgpath_to_class=None):
     device = "cuda"
     logger = logging.getLogger("PAT.test")
     logger.info("Enter inferencing")
@@ -243,10 +245,10 @@ def do_inference(cfg,
             img = img.to(device)
             # camids = camids.to(device)
             feat = model(img)
-            evaluator.update((feat, pid, camids))
+            evaluator.update_with_paths((feat, pid, camids, imgpath))
             img_path_list.extend(imgpath)
 
-    cmc, mAP, _, _, _, _, _ = evaluator.compute()
+    cmc, mAP, _, _, _, _, _ = evaluator.compute(imgpath_to_class=imgpath_to_class)
     logger.info("Validation Results ")
     logger.info("mAP: {:.1%}".format(mAP))
     for r in [1, 5, 10]:

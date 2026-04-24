@@ -36,10 +36,15 @@ def build_reid_train_loader(cfg):
     # load datasets
     _root = cfg.DATASETS.ROOT_DIR
     for d in cfg.DATASETS.TRAIN:
+        # Prepare hard class filter kwargs
+        hcf_kwargs = dict(
+            hard_class_filter_enabled=cfg.DATASETS.HARD_CLASS_FILTER.ENABLED,
+            hard_class_filter_classes=list(cfg.DATASETS.HARD_CLASS_FILTER.CLASSES)
+        )
         if d == 'CUHK03_NP':
-            dataset = DATASET_REGISTRY.get('CUHK03')(root=_root, cuhk03_labeled=False)
+            dataset = DATASET_REGISTRY.get('CUHK03')(root=_root, cuhk03_labeled=False, **hcf_kwargs)
         else:
-            dataset = DATASET_REGISTRY.get(d)(root=_root, combineall=cfg.DATASETS.COMBINEALL)
+            dataset = DATASET_REGISTRY.get(d)(root=_root, combineall=cfg.DATASETS.COMBINEALL, **hcf_kwargs)
         if comm.is_main_process():
             dataset.show_train()
         if len(dataset.train[0]) < 4:
@@ -76,15 +81,24 @@ def build_reid_train_loader(cfg):
 def build_reid_test_loader(cfg, dataset_name, opt=None, flag_test=True, shuffle=False, only_gallery=False, only_query=False, eval_time=False):
     test_transforms = build_transforms(cfg, is_train=False)
     _root = cfg.DATASETS.ROOT_DIR
+    # Prepare hard class filter kwargs
+    hcf_kwargs = dict(
+        hard_class_filter_enabled=cfg.DATASETS.HARD_CLASS_FILTER.ENABLED,
+        hard_class_filter_classes=list(cfg.DATASETS.HARD_CLASS_FILTER.CLASSES)
+    )
     if opt is None:
-        dataset = DATASET_REGISTRY.get(dataset_name)(root=_root)
+        dataset = DATASET_REGISTRY.get(dataset_name)(root=_root, **hcf_kwargs)
         if comm.is_main_process():
             if flag_test:
                 dataset.show_test()
             else:
                 dataset.show_train()
     else:
-        dataset = DATASET_REGISTRY.get(dataset_name)(root=[_root, opt])
+        dataset = DATASET_REGISTRY.get(dataset_name)(root=[_root, opt], **hcf_kwargs)
+
+    # Extract imgpath_to_class mapping if available (for hard class filtering at eval)
+    imgpath_to_class = getattr(dataset, 'imgpath_to_class', {})
+
     if flag_test:
         if only_gallery:
             test_items = dataset.gallery
@@ -115,7 +129,7 @@ def build_reid_test_loader(cfg, dataset_name, opt=None, flag_test=True, shuffle=
         batch_sampler=batch_sampler,
         num_workers=num_workers,  # save some memory
         collate_fn=fast_batch_collator)
-    return test_loader, len(dataset.query)
+    return test_loader, len(dataset.query), imgpath_to_class
 
 
 def trivial_batch_collator(batch):
