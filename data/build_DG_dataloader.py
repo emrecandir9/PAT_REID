@@ -20,7 +20,7 @@ _root = os.getenv("REID_DATASETS", "../../data")
 
 def build_reid_train_loader(cfg):
     gettrace = getattr(sys, 'gettrace', None)
-    if gettrace():
+    if gettrace is not None and gettrace():
         print('*'*100)
         print('Hmm, Big Debugger is watching me')
         print('*'*100)
@@ -119,7 +119,7 @@ def build_reid_test_loader(cfg, dataset_name, opt=None, flag_test=True, shuffle=
     batch_sampler = torch.utils.data.BatchSampler(data_sampler, batch_size, False)
 
     gettrace = getattr(sys, 'gettrace', None)
-    if gettrace():
+    if gettrace is not None and gettrace():
         num_workers = 0
     else:
         num_workers = cfg.DATALOADER.NUM_WORKERS
