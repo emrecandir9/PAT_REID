@@ -157,12 +157,15 @@ def part_attention_vit_do_train_with_amp(cfg,
         
         if epoch % eval_period == 0:
             if cfg.MODEL.DIST_TRAIN:
+                dist.barrier()  # sync before eval
                 if dist.get_rank() == 0:
-                    cmc, mAP = do_inference(cfg, model, val_loader, num_query, imgpath_to_class=imgpath_to_class)
+                    # Unwrap DDP model to avoid NCCL collectives during single-rank eval
+                    eval_model = model.module if hasattr(model, 'module') else model
+                    cmc, mAP = do_inference(cfg, eval_model, val_loader, num_query, imgpath_to_class=imgpath_to_class)
                     tbWriter.add_scalar('val/Rank@1', cmc[0], epoch)
                     tbWriter.add_scalar('val/mAP', mAP, epoch)
                     torch.cuda.empty_cache()
-                dist.barrier()  # sync all ranks after eval
+                dist.barrier()  # sync after eval
             else:
                 cmc, mAP = do_inference(cfg, model, val_loader, num_query, imgpath_to_class=imgpath_to_class)
                 tbWriter.add_scalar('val/Rank@1', cmc[0], epoch)
