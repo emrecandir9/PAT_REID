@@ -162,6 +162,7 @@ def part_attention_vit_do_train_with_amp(cfg,
                     tbWriter.add_scalar('val/Rank@1', cmc[0], epoch)
                     tbWriter.add_scalar('val/mAP', mAP, epoch)
                     torch.cuda.empty_cache()
+                dist.barrier()  # sync all ranks after eval
             else:
                 cmc, mAP = do_inference(cfg, model, val_loader, num_query, imgpath_to_class=imgpath_to_class)
                 tbWriter.add_scalar('val/Rank@1', cmc[0], epoch)
@@ -217,7 +218,7 @@ def do_inference(cfg,
     evaluator.reset()
 
     if device:
-        if torch.cuda.device_count() > 1:
+        if torch.cuda.device_count() > 1 and not isinstance(model, (torch.nn.parallel.DistributedDataParallel,)):
             print('Using {} GPUs for inference'.format(torch.cuda.device_count()))
             model = nn.DataParallel(model)
         model.to(device)
