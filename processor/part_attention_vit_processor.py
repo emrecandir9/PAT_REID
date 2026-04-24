@@ -158,19 +158,9 @@ def part_attention_vit_do_train_with_amp(cfg,
         if epoch % eval_period == 0:
             if cfg.MODEL.DIST_TRAIN:
                 if dist.get_rank() == 0:
-                    model.eval()
-                    for n_iter, (img, vid, camid, camids, target_view, _) in enumerate(val_loader):
-                        with torch.no_grad():
-                            img = img.to(device)
-                            camids = camids.to(device)
-                            target_view = target_view.to(device)
-                            feat = model(img)
-                            evaluator.update((feat, vid, camid))
-                    cmc, mAP, _, _, _, _, _ = evaluator.compute()
-                    logger.info("Validation Results - Epoch: {}".format(epoch))
-                    logger.info("mAP: {:.1%}".format(mAP))
-                    for r in [1, 5, 10]:
-                        logger.info("CMC curve, Rank-{:<3}:{:.1%}".format(r, cmc[r - 1]))
+                    cmc, mAP = do_inference(cfg, model, val_loader, num_query, imgpath_to_class=imgpath_to_class)
+                    tbWriter.add_scalar('val/Rank@1', cmc[0], epoch)
+                    tbWriter.add_scalar('val/mAP', mAP, epoch)
                     torch.cuda.empty_cache()
             else:
                 cmc, mAP = do_inference(cfg, model, val_loader, num_query, imgpath_to_class=imgpath_to_class)
