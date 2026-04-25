@@ -9,7 +9,7 @@ MODEL:
   NO_MARGIN: True
   DEVICE_ID: ('0')
   DIST_TRAIN: False
-  TRANSFORMER_TYPE: 'deit_base_patch16_224_TransReID'
+  TRANSFORMER_TYPE: 'vit_base_patch16_224_TransReID'
   STRIDE_SIZE: [16, 16]
 
 INPUT:
