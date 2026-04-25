@@ -5,7 +5,7 @@ MODEL:
   PRETRAIN_PATH: "/root/.cache/torch/hub/checkpoints/"  # Kaggle: torch hub auto-downloads here
   IF_LABELSMOOTH: 'on'
   IF_WITH_CENTER: 'no'
-  NAME: 'part_attention_vit'
+  NAME: 'vit'
   NO_MARGIN: True
   DEVICE_ID: ('0')
   DIST_TRAIN: False
@@ -13,8 +13,8 @@ MODEL:
   STRIDE_SIZE: [16, 16]
 
 INPUT:
-  SIZE_TRAIN: [224,224]
-  SIZE_TEST: [224,224]
+  SIZE_TRAIN: [256,128]
+  SIZE_TEST: [256,128]
   REA:
     ENABLED: False
     PROB: 0.5
