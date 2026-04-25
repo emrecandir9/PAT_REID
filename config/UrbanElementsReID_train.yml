@@ -16,12 +16,12 @@ INPUT:
   SIZE_TRAIN: [224,224]
   SIZE_TEST: [224,224]
   REA:
-    ENABLED: True
+    ENABLED: False
     PROB: 0.5
   PIXEL_MEAN: [0.5, 0.5, 0.5]
   PIXEL_STD: [0.5, 0.5, 0.5]
   CJ:
-    ENABLED: True
+    ENABLED: False
     PROB: 0.5
     BRIGHTNESS: 0.2
     CONTRAST: 0.2
