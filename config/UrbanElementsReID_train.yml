@@ -11,6 +11,7 @@ MODEL:
   DIST_TRAIN: False
   TRANSFORMER_TYPE: 'vit_base_patch16_224_TransReID'
   STRIDE_SIZE: [16, 16]
+  COS_LAYER: True
 
 INPUT:
   SIZE_TRAIN: [224,224]

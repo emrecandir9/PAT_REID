@@ -98,7 +98,7 @@ def part_attention_vit_do_train_with_amp(cfg,
 
             model.to(device)
             with amp.autocast(enabled=True):
-                score, layerwise_global_feat, layerwise_feat_list = model(img)
+                score, layerwise_global_feat, layerwise_feat_list = model(img, target)
                 
                 ############## patch learning ######################
                 patch_agent, position = patch_centers.get_soft_label(img_path, layerwise_feat_list[-1], vid=vid, camid=camid)

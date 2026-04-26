@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 
 from .backbones.resnet import BasicBlock, ResNet, Bottleneck
+from loss.arcface import ArcFace
 from .backbones import vit_base_patch16_224_TransReID, vit_small_patch16_224_TransReID, deit_small_patch16_224_TransReID
 
 # alter this to your pre-trained file name
@@ -281,10 +282,15 @@ class build_part_attention_vit(nn.Module):
         self.bottleneck = nn.BatchNorm1d(self.in_planes)
         self.bottleneck.bias.requires_grad_(False)
         self.bottleneck.apply(weights_init_kaiming)
-        self.classifier = nn.Linear(self.in_planes, self.num_classes, bias=False)
-        self.classifier.apply(weights_init_classifier)
+        
+        if self.cos_layer:
+            print('using ArcFace loss for PAT')
+            self.arcface = ArcFace(self.in_planes, self.num_classes, s=30.0, m=0.30)
+        else:
+            self.classifier = nn.Linear(self.in_planes, self.num_classes, bias=False)
+            self.classifier.apply(weights_init_classifier)
 
-    def forward(self, x):
+    def forward(self, x, label=None):
         layerwise_tokens = self.base(x) # B, N, C
         layerwise_cls_tokens = [t[:, 0] for t in layerwise_tokens] # cls token
         part_feat_list = layerwise_tokens[-1][:, 1: 4] # 3, 768
@@ -293,7 +299,10 @@ class build_part_attention_vit(nn.Module):
         feat = self.bottleneck(layerwise_cls_tokens[-1])
 
         if self.training:
-            cls_score = self.classifier(feat)
+            if self.cos_layer:
+                cls_score = self.arcface(feat, label)
+            else:
+                cls_score = self.classifier(feat)
             return cls_score, layerwise_cls_tokens, layerwise_part_tokens
         else:
             return feat if self.neck_feat == 'after' else layerwise_cls_tokens[-1]
