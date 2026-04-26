@@ -6,15 +6,15 @@ MODEL:
   METRIC_LOSS_TYPE: 'triplet'
   IF_LABELSMOOTH: 'on'
   IF_WITH_CENTER: 'no'
-  NAME: 'vit'
+  NAME: 'part_attention_vit'
   NO_MARGIN: True
   DEVICE_ID: ('0')
   TRANSFORMER_TYPE: 'vit_base_patch16_224_TransReID'
   STRIDE_SIZE: [16, 16]
 
 INPUT:
-  SIZE_TRAIN: [256,128]
-  SIZE_TEST: [256,128]
+  SIZE_TRAIN: [224,224]
+  SIZE_TEST: [224,224]
   REA:
     ENABLED: False
   PIXEL_MEAN: [0.5, 0.5, 0.5]
@@ -29,7 +29,7 @@ DATASETS:
   #ROOT_DIR: ('../../data') # root of datasets
   ROOT_DIR: '/kaggle/input/datasets/emreandr/urban2026/'
   HARD_CLASS_FILTER:
-    ENABLED: False                          # Per-query class filtering at eval
+    ENABLED: True                           # Per-query class filtering at eval
 
 DATALOADER:
   SAMPLER: 'softmax_triplet'
