@@ -285,7 +285,7 @@ class build_part_attention_vit(nn.Module):
         
         if self.cos_layer:
             print('using ArcFace loss for PAT')
-            self.arcface = ArcFace(self.in_planes, self.num_classes, s=30.0, m=0.30)
+            self.arcface = ArcFace(self.in_planes, self.num_classes, s=30.0, m=0.40)
         else:
             self.classifier = nn.Linear(self.in_planes, self.num_classes, bias=False)
             self.classifier.apply(weights_init_classifier)
