@@ -35,7 +35,7 @@ DATASETS:
   TRAIN: ('UrbanElementsReID',)
   TEST: ('UrbanElementsReID',)
   #ROOT_DIR: ('../../data') # root of datasets
-  ROOT_DIR: '/kaggle/input/datasets/emreandr/urban2026/'
+  ROOT_DIR: '/kaggle/input/datasets/emre2ndmail/urban2026/Urban2026'
   HARD_CLASS_FILTER:
     ENABLED: False                          # Per-query class filtering at eval
 
