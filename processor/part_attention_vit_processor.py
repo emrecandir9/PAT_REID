@@ -67,7 +67,7 @@ def part_attention_vit_do_train_with_amp(cfg,
                 #input = input.view(-1, input.size(2), input.size(3), input.size(4))
 
                 # compute output
-                _, _, layerwise_feat_list = model(input)
+                _, _, layerwise_feat_list = model(input, vid.cuda(non_blocking=True))
                 patch_centers.get_soft_label(path, layerwise_feat_list[-1], vid=vid, camid=camid)
         print('initialization done')
     
