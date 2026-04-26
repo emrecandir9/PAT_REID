@@ -28,7 +28,7 @@ INPUT:
     SATURATION: 0.15
     HUE: 0.1
   LGT: # Local Grayscale Transfomation
-    DO_LGT: False
+    DO_LGT: True
     PROB: 0.5
 
 DATASETS:
@@ -45,9 +45,9 @@ DATALOADER:
   NUM_WORKERS: 2  # Kaggle has limited CPU; 8 may OOM
 
 SOLVER:
-  OPTIMIZER_NAME: 'SGD'
+  OPTIMIZER_NAME: 'AdamW'
   MAX_EPOCHS: 40
-  BASE_LR: 0.001 # 0.0004 for msmt
+  BASE_LR: 0.00035 # AdamW needs lower LR
   IMS_PER_BATCH: 64
   WARMUP_METHOD: 'linear'
   LARGE_FC_LR: False

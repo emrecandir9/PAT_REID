@@ -140,7 +140,7 @@ if __name__ == "__main__":
     q_q_dist = np.dot(qf_np, np.transpose(qf_np))
     g_g_dist = np.dot(gf_np, np.transpose(gf_np))
 
-    re_rank_dist = re_ranking(q_g_dist, q_q_dist, g_g_dist)
+    re_rank_dist = re_ranking(q_g_dist, q_q_dist, g_g_dist, k1=10, k2=3)
 
     indices = np.argsort(re_rank_dist, axis=1)[:, :100]
 
