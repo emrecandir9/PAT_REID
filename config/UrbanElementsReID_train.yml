@@ -28,7 +28,7 @@ INPUT:
     SATURATION: 0.15
     HUE: 0.1
   LGT: # Local Grayscale Transfomation
-    DO_LGT: True
+    DO_LGT: False
     PROB: 0.5
 
 DATASETS:
