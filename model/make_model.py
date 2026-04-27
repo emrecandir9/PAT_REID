@@ -310,7 +310,7 @@ class build_part_attention_vit(nn.Module):
     def load_param(self, trained_path):
         param_dict = torch.load(trained_path)
         for i in param_dict:
-            if 'classifier' in i: # drop classifier
+            if 'classifier' in i or 'arcface' in i: # drop classifier/arcface
                 continue
             self.state_dict()[i.replace('module.', '')].copy_(param_dict[i])
         print('Loading trained model from {}'.format(trained_path))
